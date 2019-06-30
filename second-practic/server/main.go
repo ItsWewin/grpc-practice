@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	pb "grpc-learn/second-practic/chat"
 
 	"log"
@@ -12,13 +12,24 @@ import (
 
 type server struct{}
 
-func (s *server) QA(ctx context.Context, in *pb.Request) (*pb.Response, error) {
-	log.Printf("Received: %v", in.Question)
-	return &pb.Response{Answer: "Hello " + in.Question}, nil
+var answer1 = pb.Response{Answer: "answer1"}
+var answer2 = pb.Response{Answer: "answer2"}
+var answer3 = pb.Response{Answer: "answer3"}
+var answers = [...]*pb.Response{&answer1, &answer2, &answer3}
+
+func (s *server) QA(req *pb.Request, stream pb.Chat_QAServer) error {
+	for _, answer := range answers {
+		fmt.Printf("Send data: %v\n", answer.Answer)
+		if err := stream.Send(answer); err != nil {
+			fmt.Printf("Some error occurred when send data: %v", err)
+			return err
+		}
+	}
+	return nil
 }
 
 func main() {
-	l, err := net.Listen("tcp", ":50001")
+	l, err := net.Listen("tcp", "localhost:50001")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"time"
 
@@ -17,13 +18,24 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := pb.NewChatClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	r, err := c.QA(ctx, &pb.Request{Question: "wewin"})
+	client := pb.NewChatClient(conn)
+	stream, err := client.QA(ctx, &pb.Request{Question: "wewin"})
 	if err != nil {
 		log.Fatalf("Some error occurred when get data from server, %v", err)
 	}
-	log.Printf("Answer: %s", r.Answer)
+	for {
+		answer, err := stream.Recv()
+		log.Println("Come here!")
+		if err != io.EOF {
+			log.Println("Get all  data!")
+			break
+		}
+		if err != nil {
+			log.Fatalf("Some error occurred when get data: %v", err)
+		}
+		log.Println("Answer: %v", answer.Answer)
+	}
 }

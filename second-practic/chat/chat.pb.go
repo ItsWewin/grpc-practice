@@ -110,15 +110,16 @@ func init() {
 func init() { proto.RegisterFile("chat.proto", fileDescriptor_8c585a45e2093e54) }
 
 var fileDescriptor_8c585a45e2093e54 = []byte{
-	// 128 bytes of a gzipped FileDescriptorProto
+	// 130 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0xce, 0x48, 0x2c,
 	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x01, 0xb1, 0x95, 0x54, 0xb9, 0xd8, 0x83, 0x52,
 	0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0xa4, 0xb8, 0x38, 0xc0, 0x8c, 0xcc, 0xfc, 0x3c, 0x09, 0x46,
 	0x05, 0x46, 0x0d, 0xce, 0x20, 0x38, 0x5f, 0x49, 0x89, 0x8b, 0x23, 0x28, 0xb5, 0xb8, 0x20, 0x3f,
 	0xaf, 0x38, 0x55, 0x48, 0x8c, 0x8b, 0x2d, 0x31, 0xaf, 0xb8, 0x3c, 0xb5, 0x08, 0xaa, 0x0a, 0xca,
-	0x33, 0xd2, 0xe5, 0x62, 0x71, 0xce, 0x48, 0x2c, 0x11, 0x52, 0xe5, 0x62, 0x0a, 0x74, 0x14, 0xe2,
-	0xd5, 0x03, 0xdb, 0x05, 0x35, 0x5c, 0x8a, 0x0f, 0xc6, 0x85, 0x18, 0xa2, 0xc4, 0x90, 0xc4, 0x06,
-	0x76, 0x86, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x15, 0x13, 0x0c, 0xeb, 0x94, 0x00, 0x00, 0x00,
+	0x33, 0xd2, 0xe7, 0x62, 0x71, 0xce, 0x48, 0x2c, 0x11, 0x52, 0xe7, 0x62, 0x0a, 0x74, 0x14, 0xe2,
+	0xd5, 0x03, 0xdb, 0x05, 0x35, 0x5c, 0x8a, 0x0f, 0xc6, 0x85, 0x18, 0xa2, 0xc4, 0x60, 0xc0, 0x98,
+	0xc4, 0x06, 0x76, 0x88, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x28, 0x91, 0x02, 0x18, 0x96, 0x00,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -133,7 +134,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ChatClient interface {
-	QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (Chat_QAClient, error)
 }
 
 type chatClient struct {
@@ -144,59 +145,86 @@ func NewChatClient(cc *grpc.ClientConn) ChatClient {
 	return &chatClient{cc}
 }
 
-func (c *chatClient) QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
-	err := c.cc.Invoke(ctx, "/chat.Chat/QA", in, out, opts...)
+func (c *chatClient) QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (Chat_QAClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Chat_serviceDesc.Streams[0], "/chat.Chat/QA", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &chatQAClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Chat_QAClient interface {
+	Recv() (*Response, error)
+	grpc.ClientStream
+}
+
+type chatQAClient struct {
+	grpc.ClientStream
+}
+
+func (x *chatQAClient) Recv() (*Response, error) {
+	m := new(Response)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // ChatServer is the server API for Chat service.
 type ChatServer interface {
-	QA(context.Context, *Request) (*Response, error)
+	QA(*Request, Chat_QAServer) error
 }
 
 // UnimplementedChatServer can be embedded to have forward compatible implementations.
 type UnimplementedChatServer struct {
 }
 
-func (*UnimplementedChatServer) QA(ctx context.Context, req *Request) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method QA not implemented")
+func (*UnimplementedChatServer) QA(req *Request, srv Chat_QAServer) error {
+	return status.Errorf(codes.Unimplemented, "method QA not implemented")
 }
 
 func RegisterChatServer(s *grpc.Server, srv ChatServer) {
 	s.RegisterService(&_Chat_serviceDesc, srv)
 }
 
-func _Chat_QA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
-	if err := dec(in); err != nil {
-		return nil, err
+func _Chat_QA_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Request)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(ChatServer).QA(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/chat.Chat/QA",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChatServer).QA(ctx, req.(*Request))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(ChatServer).QA(m, &chatQAServer{stream})
+}
+
+type Chat_QAServer interface {
+	Send(*Response) error
+	grpc.ServerStream
+}
+
+type chatQAServer struct {
+	grpc.ServerStream
+}
+
+func (x *chatQAServer) Send(m *Response) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 var _Chat_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chat.Chat",
 	HandlerType: (*ChatServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "QA",
-			Handler:    _Chat_QA_Handler,
+			StreamName:    "QA",
+			Handler:       _Chat_QA_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "chat.proto",
 }
