@@ -2,14 +2,17 @@ syntax = "proto3";
 
 package helloworld;
 
+// 定义服务 Greeter
 service Greeter {
     rpc SayHello (Request) returns (Reply) {}
 }
 
+// 定义 Request 消息类型
 message Request {
     string name = 1;
 }
 
+// 定义 Reply 消息类型
 message Reply {
     string message = 1;
 }
