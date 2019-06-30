@@ -23,7 +23,7 @@ func main() {
 
 	r, err := c.QA(ctx, &pb.Request{Question: "wewin"})
 	if err != nil {
-		log.Fatalf("could nto greet: %v", err)
+		log.Fatalf("Some error occurred when get data from server, %v", err)
 	}
-	log.Printf("Greeting: %s", r.Answer)
+	log.Printf("Answer: %s", r.Answer)
 }
