@@ -2,14 +2,14 @@ syntax = "proto3";
 package chat;
 
 service Chat {
-    rpc Echo(Request) returns (Reply) {}
+    rpc QA(Request) returns (Response) {}
 }
 
 message Request {
-    string name = 1;
+    string question = 1;
 }
 
-message Reply {
-    string replyWorld = 1;
+message Response {
+    string answer = 1;
 }
 

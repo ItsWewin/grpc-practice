@@ -25,7 +25,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Request struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Question             string   `protobuf:"bytes,1,opt,name=question,proto3" json:"question,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -56,70 +56,69 @@ func (m *Request) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Request proto.InternalMessageInfo
 
-func (m *Request) GetName() string {
+func (m *Request) GetQuestion() string {
 	if m != nil {
-		return m.Name
+		return m.Question
 	}
 	return ""
 }
 
-type Reply struct {
-	ReplyWorld           string   `protobuf:"bytes,1,opt,name=replyWorld,proto3" json:"replyWorld,omitempty"`
+type Response struct {
+	Answer               string   `protobuf:"bytes,1,opt,name=answer,proto3" json:"answer,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Reply) Reset()         { *m = Reply{} }
-func (m *Reply) String() string { return proto.CompactTextString(m) }
-func (*Reply) ProtoMessage()    {}
-func (*Reply) Descriptor() ([]byte, []int) {
+func (m *Response) Reset()         { *m = Response{} }
+func (m *Response) String() string { return proto.CompactTextString(m) }
+func (*Response) ProtoMessage()    {}
+func (*Response) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8c585a45e2093e54, []int{1}
 }
 
-func (m *Reply) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Reply.Unmarshal(m, b)
+func (m *Response) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Response.Unmarshal(m, b)
 }
-func (m *Reply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Reply.Marshal(b, m, deterministic)
+func (m *Response) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Response.Marshal(b, m, deterministic)
 }
-func (m *Reply) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Reply.Merge(m, src)
+func (m *Response) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Response.Merge(m, src)
 }
-func (m *Reply) XXX_Size() int {
-	return xxx_messageInfo_Reply.Size(m)
+func (m *Response) XXX_Size() int {
+	return xxx_messageInfo_Response.Size(m)
 }
-func (m *Reply) XXX_DiscardUnknown() {
-	xxx_messageInfo_Reply.DiscardUnknown(m)
+func (m *Response) XXX_DiscardUnknown() {
+	xxx_messageInfo_Response.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Reply proto.InternalMessageInfo
+var xxx_messageInfo_Response proto.InternalMessageInfo
 
-func (m *Reply) GetReplyWorld() string {
+func (m *Response) GetAnswer() string {
 	if m != nil {
-		return m.ReplyWorld
+		return m.Answer
 	}
 	return ""
 }
 
 func init() {
 	proto.RegisterType((*Request)(nil), "chat.Request")
-	proto.RegisterType((*Reply)(nil), "chat.Reply")
+	proto.RegisterType((*Response)(nil), "chat.Response")
 }
 
 func init() { proto.RegisterFile("chat.proto", fileDescriptor_8c585a45e2093e54) }
 
 var fileDescriptor_8c585a45e2093e54 = []byte{
-	// 130 bytes of a gzipped FileDescriptorProto
+	// 128 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0xce, 0x48, 0x2c,
-	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x01, 0xb1, 0x95, 0x64, 0xb9, 0xd8, 0x83, 0x52,
-	0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0x84, 0xb8, 0x58, 0xf2, 0x12, 0x73, 0x53, 0x25, 0x18, 0x15,
-	0x18, 0x35, 0x38, 0x83, 0xc0, 0x6c, 0x25, 0x75, 0x2e, 0xd6, 0xa0, 0xd4, 0x82, 0x9c, 0x4a, 0x21,
-	0x39, 0x2e, 0xae, 0x22, 0x10, 0x23, 0x3c, 0xbf, 0x28, 0x27, 0x05, 0xaa, 0x04, 0x49, 0xc4, 0x48,
-	0x87, 0x8b, 0xc5, 0x39, 0x23, 0xb1, 0x44, 0x48, 0x85, 0x8b, 0xc5, 0x35, 0x39, 0x23, 0x5f, 0x88,
-	0x57, 0x0f, 0x6c, 0x15, 0xd4, 0x6c, 0x29, 0x6e, 0x18, 0xb7, 0x20, 0xa7, 0x52, 0x89, 0x21, 0x89,
-	0x0d, 0xec, 0x04, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x2e, 0x26, 0x84, 0xfe, 0x90, 0x00,
-	0x00, 0x00,
+	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x01, 0xb1, 0x95, 0x54, 0xb9, 0xd8, 0x83, 0x52,
+	0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0xa4, 0xb8, 0x38, 0xc0, 0x8c, 0xcc, 0xfc, 0x3c, 0x09, 0x46,
+	0x05, 0x46, 0x0d, 0xce, 0x20, 0x38, 0x5f, 0x49, 0x89, 0x8b, 0x23, 0x28, 0xb5, 0xb8, 0x20, 0x3f,
+	0xaf, 0x38, 0x55, 0x48, 0x8c, 0x8b, 0x2d, 0x31, 0xaf, 0xb8, 0x3c, 0xb5, 0x08, 0xaa, 0x0a, 0xca,
+	0x33, 0xd2, 0xe5, 0x62, 0x71, 0xce, 0x48, 0x2c, 0x11, 0x52, 0xe5, 0x62, 0x0a, 0x74, 0x14, 0xe2,
+	0xd5, 0x03, 0xdb, 0x05, 0x35, 0x5c, 0x8a, 0x0f, 0xc6, 0x85, 0x18, 0xa2, 0xc4, 0x90, 0xc4, 0x06,
+	0x76, 0x86, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x15, 0x13, 0x0c, 0xeb, 0x94, 0x00, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -134,7 +133,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ChatClient interface {
-	Echo(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
+	QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 }
 
 type chatClient struct {
@@ -145,9 +144,9 @@ func NewChatClient(cc *grpc.ClientConn) ChatClient {
 	return &chatClient{cc}
 }
 
-func (c *chatClient) Echo(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error) {
-	out := new(Reply)
-	err := c.cc.Invoke(ctx, "/chat.Chat/Echo", in, out, opts...)
+func (c *chatClient) QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/chat.Chat/QA", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -156,35 +155,35 @@ func (c *chatClient) Echo(ctx context.Context, in *Request, opts ...grpc.CallOpt
 
 // ChatServer is the server API for Chat service.
 type ChatServer interface {
-	Echo(context.Context, *Request) (*Reply, error)
+	QA(context.Context, *Request) (*Response, error)
 }
 
 // UnimplementedChatServer can be embedded to have forward compatible implementations.
 type UnimplementedChatServer struct {
 }
 
-func (*UnimplementedChatServer) Echo(ctx context.Context, req *Request) (*Reply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Echo not implemented")
+func (*UnimplementedChatServer) QA(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QA not implemented")
 }
 
 func RegisterChatServer(s *grpc.Server, srv ChatServer) {
 	s.RegisterService(&_Chat_serviceDesc, srv)
 }
 
-func _Chat_Echo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Chat_QA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChatServer).Echo(ctx, in)
+		return srv.(ChatServer).QA(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.Chat/Echo",
+		FullMethod: "/chat.Chat/QA",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChatServer).Echo(ctx, req.(*Request))
+		return srv.(ChatServer).QA(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -194,8 +193,8 @@ var _Chat_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*ChatServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Echo",
-			Handler:    _Chat_Echo_Handler,
+			MethodName: "QA",
+			Handler:    _Chat_QA_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -12,9 +12,9 @@ import (
 
 type server struct{}
 
-func (s *server) Echo(ctx context.Context, in *pb.Request) (*pb.Reply, error) {
-	log.Printf("Received: %v", in.Name)
-	return &pb.Reply{ReplyWorld: "Hello " + in.Name}, nil
+func (s *server) QA(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+	log.Printf("Received: %v", in.Question)
+	return &pb.Response{Answer: "Hello " + in.Question}, nil
 }
 
 func main() {

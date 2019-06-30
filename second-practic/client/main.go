@@ -21,9 +21,9 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	r, err := c.Echo(ctx, &pb.Request{Name: "wewin"})
+	r, err := c.QA(ctx, &pb.Request{Question: "wewin"})
 	if err != nil {
 		log.Fatalf("could nto greet: %v", err)
 	}
-	log.Printf("Greeting: %s", r.ReplyWorld)
+	log.Printf("Greeting: %s", r.Answer)
 }
