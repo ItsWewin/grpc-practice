@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	pb "grpc-learn/second-practic/chat"
 
 	"log"
@@ -12,20 +12,8 @@ import (
 
 type server struct{}
 
-var answer1 = pb.Response{Answer: "answer1"}
-var answer2 = pb.Response{Answer: "answer2"}
-var answer3 = pb.Response{Answer: "answer3"}
-var answers = [...]*pb.Response{&answer1, &answer2, &answer3}
-
-func (s *server) QA(req *pb.Request, stream pb.Chat_QAServer) error {
-	for _, answer := range answers {
-		fmt.Printf("Send data: %v\n", answer.Answer)
-		if err := stream.Send(answer); err != nil {
-			fmt.Printf("Some error occurred when send data: %v", err)
-			return err
-		}
-	}
-	return nil
+func (s *server) QA(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+	return &pb.Response{Answer: "Search Answer of " + in.Question}, nil
 }
 
 func main() {

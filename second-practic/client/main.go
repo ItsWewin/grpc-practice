@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io"
 	"log"
 	"time"
 
@@ -10,6 +9,17 @@ import (
 
 	"google.golang.org/grpc"
 )
+
+func unaryRPCs(client pb.ChatClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	res, err := client.QA(ctx, &pb.Request{Question: "question1"})
+	if err != nil {
+		log.Fatalf("Some error occurred when get data from server, %v", err)
+	}
+	log.Printf("Answer: %s", res.Answer)
+}
 
 func main() {
 	conn, err := grpc.Dial("localhost:50001", grpc.WithInsecure())
@@ -20,21 +30,5 @@ func main() {
 
 	client := pb.NewChatClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	stream, err := client.QA(ctx, &pb.Request{Question: "wewin"})
-	if err != nil {
-		log.Fatalf("Some error occurred when get data from server, %v", err)
-	}
-	for {
-		answer, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			log.Fatalf("Some error occurred when get data: %v", err)
-		}
-		log.Println("Answer: ", answer.Answer)
-	}
+	unaryRPCs(client)
 }
