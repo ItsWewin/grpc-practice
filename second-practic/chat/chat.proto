@@ -2,7 +2,7 @@ syntax = "proto3";
 package chat;
 
 service Chat {
-    rpc QA(Request) returns (stream Response) {}
+    rpc QA(stream Request) returns (stream Response) {}
 }
 
 message Request {

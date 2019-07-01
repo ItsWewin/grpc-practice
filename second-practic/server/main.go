@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	pb "grpc-learn/second-practic/chat"
+	"io"
 
 	"log"
 	"net"
@@ -17,15 +17,22 @@ var answer2 = pb.Response{Answer: "answer2"}
 var answer3 = pb.Response{Answer: "answer3"}
 var answers = [...]*pb.Response{&answer1, &answer2, &answer3}
 
-func (s *server) QA(req *pb.Request, stream pb.Chat_QAServer) error {
-	for _, answer := range answers {
-		fmt.Printf("Send data: %v\n", answer.Answer)
-		if err := stream.Send(answer); err != nil {
-			fmt.Printf("Some error occurred when send data: %v", err)
+func (s *server) QA(stream pb.Chat_QAServer) error {
+	for {
+		request, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
 			return err
 		}
+
+		for _, w := range request.Question {
+			if err := stream.Send(&pb.Response{Answer: string(w)}); err != nil {
+				return err
+			}
+		}
 	}
-	return nil
 }
 
 func main() {
