@@ -117,8 +117,8 @@ var fileDescriptor_8c585a45e2093e54 = []byte{
 	0x05, 0x46, 0x0d, 0xce, 0x20, 0x38, 0x5f, 0x49, 0x89, 0x8b, 0x23, 0x28, 0xb5, 0xb8, 0x20, 0x3f,
 	0xaf, 0x38, 0x55, 0x48, 0x8c, 0x8b, 0x2d, 0x31, 0xaf, 0xb8, 0x3c, 0xb5, 0x08, 0xaa, 0x0a, 0xca,
 	0x33, 0xd2, 0xe7, 0x62, 0x71, 0xce, 0x48, 0x2c, 0x11, 0x52, 0xe7, 0x62, 0x0a, 0x74, 0x14, 0xe2,
-	0xd5, 0x03, 0xdb, 0x05, 0x35, 0x5c, 0x8a, 0x0f, 0xc6, 0x85, 0x18, 0xa2, 0xc4, 0x60, 0xc0, 0x98,
-	0xc4, 0x06, 0x76, 0x88, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x28, 0x91, 0x02, 0x18, 0x96, 0x00,
+	0xd5, 0x03, 0xdb, 0x05, 0x35, 0x5c, 0x8a, 0x0f, 0xc6, 0x85, 0x18, 0xa2, 0xc4, 0xa0, 0xc1, 0x98,
+	0xc4, 0x06, 0x76, 0x88, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x34, 0x50, 0x7b, 0x2c, 0x96, 0x00,
 	0x00, 0x00,
 }
 
@@ -134,7 +134,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ChatClient interface {
-	QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (Chat_QAClient, error)
+	QA(ctx context.Context, opts ...grpc.CallOption) (Chat_QAClient, error)
 }
 
 type chatClient struct {
@@ -145,23 +145,18 @@ func NewChatClient(cc *grpc.ClientConn) ChatClient {
 	return &chatClient{cc}
 }
 
-func (c *chatClient) QA(ctx context.Context, in *Request, opts ...grpc.CallOption) (Chat_QAClient, error) {
+func (c *chatClient) QA(ctx context.Context, opts ...grpc.CallOption) (Chat_QAClient, error) {
 	stream, err := c.cc.NewStream(ctx, &_Chat_serviceDesc.Streams[0], "/chat.Chat/QA", opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &chatQAClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
 	return x, nil
 }
 
 type Chat_QAClient interface {
-	Recv() (*Response, error)
+	Send(*Request) error
+	CloseAndRecv() (*Response, error)
 	grpc.ClientStream
 }
 
@@ -169,7 +164,14 @@ type chatQAClient struct {
 	grpc.ClientStream
 }
 
-func (x *chatQAClient) Recv() (*Response, error) {
+func (x *chatQAClient) Send(m *Request) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *chatQAClient) CloseAndRecv() (*Response, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	m := new(Response)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -179,14 +181,14 @@ func (x *chatQAClient) Recv() (*Response, error) {
 
 // ChatServer is the server API for Chat service.
 type ChatServer interface {
-	QA(*Request, Chat_QAServer) error
+	QA(Chat_QAServer) error
 }
 
 // UnimplementedChatServer can be embedded to have forward compatible implementations.
 type UnimplementedChatServer struct {
 }
 
-func (*UnimplementedChatServer) QA(req *Request, srv Chat_QAServer) error {
+func (*UnimplementedChatServer) QA(srv Chat_QAServer) error {
 	return status.Errorf(codes.Unimplemented, "method QA not implemented")
 }
 
@@ -195,15 +197,12 @@ func RegisterChatServer(s *grpc.Server, srv ChatServer) {
 }
 
 func _Chat_QA_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Request)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ChatServer).QA(m, &chatQAServer{stream})
+	return srv.(ChatServer).QA(&chatQAServer{stream})
 }
 
 type Chat_QAServer interface {
-	Send(*Response) error
+	SendAndClose(*Response) error
+	Recv() (*Request, error)
 	grpc.ServerStream
 }
 
@@ -211,8 +210,16 @@ type chatQAServer struct {
 	grpc.ServerStream
 }
 
-func (x *chatQAServer) Send(m *Response) error {
+func (x *chatQAServer) SendAndClose(m *Response) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func (x *chatQAServer) Recv() (*Request, error) {
+	m := new(Request)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 var _Chat_serviceDesc = grpc.ServiceDesc{
@@ -223,7 +230,7 @@ var _Chat_serviceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "QA",
 			Handler:       _Chat_QA_Handler,
-			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "chat.proto",
