@@ -18,24 +18,23 @@ func main() {
 	}
 	defer conn.Close()
 
+	client := pb.NewChatClient(conn)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client := pb.NewChatClient(conn)
 	stream, err := client.QA(ctx, &pb.Request{Question: "wewin"})
 	if err != nil {
 		log.Fatalf("Some error occurred when get data from server, %v", err)
 	}
 	for {
 		answer, err := stream.Recv()
-		log.Println("Come here!")
-		if err != io.EOF {
-			log.Println("Get all  data!")
+		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			log.Fatalf("Some error occurred when get data: %v", err)
 		}
-		log.Println("Answer: %v", answer.Answer)
+		log.Println("Answer: ", answer.Answer)
 	}
 }
