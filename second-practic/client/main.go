@@ -11,15 +11,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func main() {
-	conn, err := grpc.Dial("localhost:50001", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Connect server error: %v", err)
-	}
-	defer conn.Close()
-
-	client := pb.NewChatClient(conn)
-
+func serverStrem(client pb.ChatClient) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -37,4 +29,16 @@ func main() {
 		}
 		log.Println("Answer: ", answer.Answer)
 	}
+}
+
+func main() {
+	conn, err := grpc.Dial("localhost:50001", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Connect server error: %v", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewChatClient(conn)
+
+	serverStrem(client)
 }
