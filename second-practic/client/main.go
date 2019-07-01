@@ -17,15 +17,7 @@ var questions = [...]*pb.Request{
 	&pb.Request{Question: "question3"},
 }
 
-func main() {
-	conn, err := grpc.Dial("localhost:50001", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Connect server error: %v", err)
-	}
-	defer conn.Close()
-
-	client := pb.NewChatClient(conn)
-
+func delBidirectionalStream(client pb.ChatClient) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -34,7 +26,10 @@ func main() {
 		log.Fatalf("Some error occurred when get data from server, %v", err)
 	}
 
+	// 无缓冲 Channel
+	// 阻塞主goroutine，防止提前退出
 	wait := make(chan struct{})
+	// 使用 goroutine 处理服务端响应
 	go func() {
 		for {
 			answer, err := stream.Recv()
@@ -49,6 +44,7 @@ func main() {
 		}
 	}()
 
+	// 发送请求到服务端
 	for _, question := range questions {
 		if err := stream.Send(question); err != nil {
 			log.Fatalf("Some error occurred when sent data to server, error;l %v", err)
@@ -56,4 +52,16 @@ func main() {
 	}
 	stream.CloseSend()
 	<-wait
+}
+
+func main() {
+	conn, err := grpc.Dial("localhost:50001", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Connect server error: %v", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewChatClient(conn)
+
+	delBidirectionalStream(client)
 }
